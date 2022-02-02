@@ -42,9 +42,9 @@ common = files([
   'deflate/src/inflator.c',
   'deflate/src/deflator.c',
   'deflate/src/zstrm.c',
-	'deflate/ctoolbox/crypto/src/crc32.c'
+  'deflate/ctoolbox/crypto/src/crc32.c'
 ])
 
-executable('inflator', sources: [common + 'inflator.c'], include_directories: includes)
-executable('deflator', sources: [common + 'deflator.c'], include_directories: includes)
-executable('zstrm',    sources: [common +    'zstrm.c'], include_directories: includes)
+executable('inflator', sources: common + ['inflator.c'], include_directories: includes)
+executable('deflator', sources: common + ['deflator.c'], include_directories: includes)
+executable('zstrm',    sources: common + [   'zstrm.c'], include_directories: includes)
