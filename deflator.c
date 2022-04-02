@@ -5,14 +5,14 @@
 static uint8 source[4096];
 static uint8 target[4096];
 
-int
+bool
 compressfile(FILE* ihandler, FILE* ohandler)
 {
 	uintxx final;
-	uintxx done;
 	uintxx result;
 	uintxx icount;
 	uintxx ocount;
+	bool done;
 	TDeflator* state;
 	
 	state = deflator_create(9);
@@ -36,7 +36,7 @@ compressfile(FILE* ihandler, FILE* ohandler)
 			deflator_settgt(state, target, sizeof(target));
 			result = deflator_deflate(state, final);
 			
-			if ((ocount = deflator_tgtend(state))) {
+			if ((ocount = deflator_tgtend(state)) != 0) {
 				fwrite(target, 1, ocount, ohandler);
 				if (ferror(ohandler))
 					goto L_ERROR;
@@ -50,6 +50,11 @@ L_ERROR:
 	deflator_destroy(state);
 	return done;
 }
+
+
+#if defined(__MSVC__)
+	#pragma warning(disable: 4996)
+#endif
 
 int
 main(int argc, char* argv[])

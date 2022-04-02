@@ -3,7 +3,7 @@
 #include <zstrm.h>
 
 
-uint8 buffer[4096];
+uint8 iobuffer[4096];
 
 
 intxx
@@ -43,9 +43,9 @@ inflate(TZStrm* z, FILE* source, FILE* target)
 	
 	zstrm_setiofn(z, rcallback, source);
 	do {
-		r = zstrm_r(z, buffer, sizeof(buffer));
+		r = zstrm_r(z, iobuffer, sizeof(iobuffer));
 		
-		if (fwrite(buffer, 1, r, target) != r || ferror(target)) {
+		if (fwrite(iobuffer, 1, r, target) != r || ferror(target)) {
 			puts("Error: IO error while writing file");
 			return 0;
 		}
@@ -71,13 +71,13 @@ deflate(TZStrm* z, FILE* source, FILE* target)
 	
 	zstrm_setiofn(z, wcallback, target);
 	do {
-		r = fread(buffer, 1, sizeof(buffer), source);
+		r = fread(iobuffer, 1, sizeof(iobuffer), source);
 		if (ferror(source)) {
 			puts("Error while reading file");
 			return 0;
 		}
 		
-		zstrm_w(z, buffer, r);
+		zstrm_w(z, iobuffer, r);
 		if (zstrm_geterror(z)) {
 			puts("Error: zstream error");
 			return 0;
@@ -106,6 +106,11 @@ showusage(void)
 	puts("thisprogram <compressed file> <output file>");
 	exit(0);
 }
+
+
+#if defined(__MSVC__)
+	#pragma warning(disable: 4996)
+#endif
 
 int
 main(int argc, char* argv[])

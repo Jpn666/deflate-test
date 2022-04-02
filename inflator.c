@@ -5,14 +5,14 @@
 static uint8 source[4096];
 static uint8 target[4096];
 
-int
+bool
 decompressfile(FILE* ihandler, FILE* ohandler)
 {
 	uintxx final;
-	uintxx done;
 	uintxx result;
 	uintxx icount;
 	uintxx ocount;
+	bool done;
 	TInflator* state;
 	
 	state = inflator_create();
@@ -36,7 +36,7 @@ decompressfile(FILE* ihandler, FILE* ohandler)
 			inflator_settgt(state, target, sizeof(target));
 			result = inflator_inflate(state, final);
 			
-			if ((ocount = inflator_tgtend(state))) {
+			if ((ocount = inflator_tgtend(state)) != 0) {
 				fwrite(target, 1, ocount, ohandler);
 				if (ferror(ohandler))
 					goto L_ERROR;
@@ -50,6 +50,11 @@ L_ERROR:
 	inflator_destroy(state);
 	return done;
 }
+
+
+#if defined(__MSVC__)
+	#pragma warning(disable: 4996)
+#endif
 
 int
 main(int argc, char* argv[])
