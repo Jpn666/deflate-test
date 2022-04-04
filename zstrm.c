@@ -135,12 +135,12 @@ main(int argc, char* argv[])
 		
 		source = fopen(argv[2], "rb");
 		target = fopen(argv[3], "wb");
-		z = zstrm_create(ZSTRM_WMODE + level, ZSTRM_GZIP);
+		z = zstrm_create(ZSTRM_WMODE, ZSTRM_GZIP, level);
 	}
 	else {
 		source = fopen(argv[1], "rb");
 		target = fopen(argv[2], "wb");
-		z = zstrm_create(ZSTRM_RMODE, ZSTRM_AUTO);
+		z = zstrm_create(ZSTRM_RMODE, ZSTRM_AUTO, 0);
 	}
 	
 	if (source == NULL || target == NULL || z == NULL) {
