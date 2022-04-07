@@ -5,19 +5,18 @@
 
 uint8 iobuffer[4096];
 
-
 intxx
 rcallback(uint8* buffer, uintxx size, void* user)
 {
 	uintxx r;
-	
+
 	r = fread(buffer, 1, size, (FILE*) user);
 	if (r != size) {
 		if (ferror((FILE*) user)) {
 			return -1;
 		}
 	}
-	
+
 	return r;
 }
 
@@ -25,7 +24,7 @@ intxx
 wcallback(uint8* buffer, uintxx size, void* user)
 {
 	uintxx r;
-	
+
 	r = fwrite(buffer, 1, size, (FILE*) user);
 	if (r != size) {
 		if (ferror((FILE*) user)) {
@@ -40,22 +39,22 @@ bool
 inflate(TZStrm* z, FILE* source, FILE* target)
 {
 	uintxx r;
-	
+
 	zstrm_setiofn(z, rcallback, source);
 	do {
 		r = zstrm_r(z, iobuffer, sizeof(iobuffer));
-		
+
 		if (fwrite(iobuffer, 1, r, target) != r || ferror(target)) {
 			puts("Error: IO error while writing file");
 			return 0;
 		}
 	} while (zstrm_eof(z) == 0);
-	
+
 	if (zstrm_geterror(z)) {
 		puts("Error: zstream error");
 		return 0;
 	}
-	
+
 	fflush(target);
 	if (ferror(target)) {
 		puts("Error: IO error");
@@ -68,7 +67,7 @@ bool
 deflate(TZStrm* z, FILE* source, FILE* target)
 {
 	uintxx r;
-	
+
 	zstrm_setiofn(z, wcallback, target);
 	do {
 		r = fread(iobuffer, 1, sizeof(iobuffer), source);
@@ -76,7 +75,7 @@ deflate(TZStrm* z, FILE* source, FILE* target)
 			puts("Error while reading file");
 			return 0;
 		}
-		
+
 		zstrm_w(z, iobuffer, r);
 		if (zstrm_geterror(z)) {
 			puts("Error: zstream error");
@@ -84,12 +83,12 @@ deflate(TZStrm* z, FILE* source, FILE* target)
 		}
 	} while (feof(source) == 0);
 	zstrm_endstream(z);
-	
+
 	if (zstrm_geterror(z)) {
 		puts("Error: zstream error");
 		return 0;
 	}
-	
+
 	fflush(target);
 	if (ferror(target)) {
 		puts("Error: IO error");
@@ -120,11 +119,11 @@ main(int argc, char* argv[])
 	FILE* source;
 	FILE* target;
 	TZStrm* z;
-	
+
 	if (argc != 3 && argc != 4) {
 		showusage();
 	}
-	
+
 	if (argc == 4) {
 		lvend = argv[1];
 		level = strtoll(argv[1], &lvend, 0);
@@ -132,7 +131,7 @@ main(int argc, char* argv[])
 			puts("Invalid compression level...");
 			showusage();
 		}
-		
+
 		source = fopen(argv[2], "rb");
 		target = fopen(argv[3], "wb");
 		z = zstrm_create(ZSTRM_WMODE, ZSTRM_GZIP, level);
@@ -142,25 +141,25 @@ main(int argc, char* argv[])
 		target = fopen(argv[2], "wb");
 		z = zstrm_create(ZSTRM_RMODE, ZSTRM_AUTO, 0);
 	}
-	
+
 	if (source == NULL || target == NULL || z == NULL) {
 		puts("IO error");
 		if (source)
 			fclose(source);
 		if (target)
 			fclose(target);
-		
+
 		zstrm_destroy(z);
 		exit(0);
 	}
-	
+
 	if (argc == 4) {
 		deflate(z, source, target);
 	}
 	else {
 		inflate(z, source, target);
 	}
-	
+
 	zstrm_destroy(z);
 	fclose(source);
 	fclose(target);

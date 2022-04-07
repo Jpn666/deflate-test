@@ -14,12 +14,12 @@ decompressfile(FILE* ihandler, FILE* ohandler)
 	uintxx ocount;
 	bool done;
 	TInflator* state;
-	
+
 	state = inflator_create();
 	if (state == NULL) {
 		return 0;
 	}
-	
+
 	final = done = 0;
 	do {
 		if (feof(ihandler) == 0) {
@@ -31,11 +31,11 @@ decompressfile(FILE* ihandler, FILE* ohandler)
 		else {
 			final = 1;
 		}
-		
+
 		do {
 			inflator_settgt(state, target, sizeof(target));
 			result = inflator_inflate(state, final);
-			
+
 			if ((ocount = inflator_tgtend(state)) != 0) {
 				fwrite(target, 1, ocount, ohandler);
 				if (ferror(ohandler))
@@ -43,7 +43,7 @@ decompressfile(FILE* ihandler, FILE* ohandler)
 			}
 		} while (result == INFLT_TGTEXHSTD);
 	} while (result == INFLT_SRCEXHSTD);
-	
+
 	if (result == INFLT_OK)
 		done = 1;
 L_ERROR:
@@ -61,12 +61,12 @@ main(int argc, char* argv[])
 {
 	FILE* ihandler;
 	FILE* ohandler;
-	
+
 	if (argc != 3) {
 		puts("Usage: thisprogram <input file> <output>");
 		return 0;
 	}
-	
+
 	ihandler = fopen(argv[1], "rb");
 	ohandler = fopen(argv[2], "wb");
 	if (ihandler == NULL || ohandler == NULL) {

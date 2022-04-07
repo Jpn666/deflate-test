@@ -14,12 +14,12 @@ compressfile(FILE* ihandler, FILE* ohandler)
 	uintxx ocount;
 	bool done;
 	TDeflator* state;
-	
+
 	state = deflator_create(9);
 	if (state == NULL) {
 		return 0;
 	}
-	
+
 	final = done = 0;
 	do {
 		if (feof(ihandler) == 0) {
@@ -31,11 +31,11 @@ compressfile(FILE* ihandler, FILE* ohandler)
 		else {
 			final = 1;
 		}
-		
+
 		do {
 			deflator_settgt(state, target, sizeof(target));
 			result = deflator_deflate(state, final);
-			
+
 			if ((ocount = deflator_tgtend(state)) != 0) {
 				fwrite(target, 1, ocount, ohandler);
 				if (ferror(ohandler))
@@ -43,7 +43,7 @@ compressfile(FILE* ihandler, FILE* ohandler)
 			}
 		} while (result == DEFLT_TGTEXHSTD);
 	} while (result == DEFLT_SRCEXHSTD);
-	
+
 	if (result == DEFLT_OK)
 		done = 1;
 L_ERROR:
@@ -61,12 +61,12 @@ main(int argc, char* argv[])
 {
 	FILE* ihandler;
 	FILE* ohandler;
-	
+
 	if (argc != 3) {
 		puts("Usage: thisprogram <input file> <output>");
 		return 0;
 	}
-	
+
 	ihandler = fopen(argv[1], "rb");
 	ohandler = fopen(argv[2], "wb");
 	if (ihandler == NULL || ohandler == NULL) {
