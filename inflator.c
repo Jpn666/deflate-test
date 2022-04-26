@@ -6,7 +6,7 @@ static uint8 source[4096];
 static uint8 target[4096];
 
 bool
-decompressfile(FILE* ihandler, FILE* ohandler)
+decompressfile(FILE* ihandle, FILE* ohandle)
 {
 	uintxx final;
 	uintxx result;
@@ -22,9 +22,9 @@ decompressfile(FILE* ihandler, FILE* ohandler)
 
 	final = done = 0;
 	do {
-		if (feof(ihandler) == 0) {
-			icount = fread(source, 1, sizeof(source), ihandler);
-			if (ferror(ihandler))
+		if (feof(ihandle) == 0) {
+			icount = fread(source, 1, sizeof(source), ihandle);
+			if (ferror(ihandle))
 				goto L_ERROR;
 			inflator_setsrc(state, source, icount);
 		}
@@ -37,8 +37,8 @@ decompressfile(FILE* ihandler, FILE* ohandler)
 			result = inflator_inflate(state, final);
 
 			if ((ocount = inflator_tgtend(state)) != 0) {
-				fwrite(target, 1, ocount, ohandler);
-				if (ferror(ohandler))
+				fwrite(target, 1, ocount, ohandle);
+				if (ferror(ohandle))
 					goto L_ERROR;
 			}
 		} while (result == INFLT_TGTEXHSTD);
@@ -59,27 +59,27 @@ L_ERROR:
 int
 main(int argc, char* argv[])
 {
-	FILE* ihandler;
-	FILE* ohandler;
+	FILE* ihandle;
+	FILE* ohandle;
 
 	if (argc != 3) {
 		puts("Usage: thisprogram <input file> <output>");
 		return 0;
 	}
 
-	ihandler = fopen(argv[1], "rb");
-	ohandler = fopen(argv[2], "wb");
-	if (ihandler == NULL || ohandler == NULL) {
-		if (ihandler)
-			fclose(ihandler);
-		if (ohandler)
-			fclose(ohandler);
+	ihandle = fopen(argv[1], "rb");
+	ohandle = fopen(argv[2], "wb");
+	if (ihandle == NULL || ohandle == NULL) {
+		if (ihandle)
+			fclose(ihandle);
+		if (ohandle)
+			fclose(ohandle);
 		return 0;
 	}
-	if (decompressfile(ihandler, ohandler)) {
+	if (decompressfile(ihandle, ohandle)) {
 		puts("Done");
 	}
-	fclose(ihandler);
-	fclose(ohandler);
+	fclose(ihandle);
+	fclose(ohandle);
 	return 0;
 }
