@@ -111,6 +111,21 @@ showusage(void)
 	#pragma warning(disable: 4996)
 #endif
 
+
+static void*
+reserve(void* user, uintxx amount)
+{
+	(void) user;
+	return malloc(amount);
+}
+
+static void
+release(void* user, void* memory)
+{
+	(void) user;
+	free(memory);
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -119,11 +134,16 @@ main(int argc, char* argv[])
 	FILE* source;
 	FILE* target;
 	TZStrm* z;
+	TAllocator allocator[1];
 
 	if (argc != 3 && argc != 4) {
 		showusage();
 	}
 
+	allocator[0].reserve = reserve;
+	allocator[0].release = release;
+
+	level = 0;
 	if (argc == 4) {
 		lvend = argv[1];
 		level = strtoll(argv[1], &lvend, 0);
@@ -134,15 +154,24 @@ main(int argc, char* argv[])
 
 		source = fopen(argv[2], "rb");
 		target = fopen(argv[3], "wb");
-		z = zstrm_create(ZSTRM_WMODE, ZSTRM_GZIP, level);
+		z = zstrm_create(ZSTRM_WMODE | ZSTRM_GZIP, level, allocator);
 	}
 	else {
 		source = fopen(argv[1], "rb");
 		target = fopen(argv[2], "wb");
-		z = zstrm_create(ZSTRM_RMODE, ZSTRM_AUTO, 0);
+		/* level is ignored here */
+		z = zstrm_create(ZSTRM_RMODE | ZSTRM_AUTO, level, allocator);
 	}
 
-	if (source == NULL || target == NULL || z == NULL) {
+	if (z == NULL) {
+		puts("Failed to create zstream struct");
+		if (source)
+			fclose(source);
+		if (target)
+			fclose(target);
+		exit(0);
+	}
+	if (source == NULL || target == NULL) {
 		puts("IO error");
 		if (source)
 			fclose(source);
