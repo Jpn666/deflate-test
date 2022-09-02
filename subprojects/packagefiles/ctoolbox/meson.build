@@ -47,31 +47,13 @@ externalobjs   = []
 
 base = 'src'
 projectsources += [
-  base / 'ctoolbox.c',
-  base / 'dynarray.c',
-  base / 'ctype.c',
-]
-
-base = 'utils/src'
-projectsources += [
-  base / 'str2int.c',
-  base / 'str2flt.c',
-  base / 'ecnfg.c',
-  base / 'chrono.c',
+  base / 'ctoolbox.c'
 ]
 
 base = 'crypto/src'
 projectsources += [
-  base / 'tiger.c',
-  base / 'sha512.c',
-  base / 'sha256.c',
-  base / 'sha1.c',
-  base / 'md5.c',
-  base / 'base64.c',
-  base / 'base32.c',
-  base / 'aes.c',
   base / 'adler32.c',
-  base / 'crc32.c',
+  base / 'crc32.c'
 ]
 
 if target == 'x86_64'
