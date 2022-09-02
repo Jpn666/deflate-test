@@ -48,9 +48,9 @@ inflate(TZStrm* z, FILE* source, FILE* target)
 			puts("Error: IO error while writing file");
 			return 0;
 		}
-	} while (zstrm_eof(z) == 0);
+	} while (z->state != ZSTRM_END);
 
-	if (zstrm_geterror(z)) {
+	if (z->error) {
 		puts("Error: zstream error");
 		return 0;
 	}
@@ -77,14 +77,14 @@ deflate(TZStrm* z, FILE* source, FILE* target)
 		}
 
 		zstrm_w(z, iobuffer, r);
-		if (zstrm_geterror(z)) {
+		if (z->error) {
 			puts("Error: zstream error");
 			return 0;
 		}
 	} while (feof(source) == 0);
-	zstrm_endstream(z);
+	zstrm_flush(z, 1);
 
-	if (zstrm_geterror(z)) {
+	if (z->error) {
 		puts("Error: zstream error");
 		return 0;
 	}
@@ -101,7 +101,7 @@ void
 showusage(void)
 {
 	puts("Usage:");
-	puts("thisprogram <0|1|2|3|4|5|6|7|8|9> <input file> <compressed file>");
+	puts("thisprogram <0...9> <input file> <compressed file>");
 	puts("thisprogram <compressed file> <output file>");
 	exit(0);
 }
