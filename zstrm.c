@@ -51,7 +51,7 @@ inflate(TZStrm* z, FILE* source, FILE* target)
 	} while (z->state != ZSTRM_END);
 
 	if (z->error) {
-		puts("Error: zstream error");
+		puts("Error: Zstream error");
 		return 0;
 	}
 
@@ -72,20 +72,20 @@ deflate(TZStrm* z, FILE* source, FILE* target)
 	do {
 		r = fread(iobuffer, 1, sizeof(iobuffer), source);
 		if (ferror(source)) {
-			puts("Error while reading file");
+			puts("Error: IO error while reading file");
 			return 0;
 		}
 
 		zstrm_w(z, iobuffer, r);
 		if (z->error) {
-			puts("Error: zstream error");
+			puts("Error: Zstream error");
 			return 0;
 		}
 	} while (feof(source) == 0);
 	zstrm_flush(z, 1);
 
 	if (z->error) {
-		puts("Error: zstream error");
+		puts("Error: Zstream error");
 		return 0;
 	}
 
@@ -148,7 +148,7 @@ main(int argc, char* argv[])
 		lvend = argv[1];
 		level = strtoll(argv[1], &lvend, 0);
 		if (lvend == argv[1] || level < 0 || level > 9) {
-			puts("Invalid compression level...");
+			puts("Error: Invalid compression level...");
 			showusage();
 		}
 
@@ -164,22 +164,12 @@ main(int argc, char* argv[])
 	}
 
 	if (z == NULL) {
-		puts("Failed to create zstream struct");
-		if (source)
-			fclose(source);
-		if (target)
-			fclose(target);
-		exit(0);
+		puts("Error: Failed to create Zstream struct");
+		goto L_ERROR;
 	}
 	if (source == NULL || target == NULL) {
-		puts("IO error");
-		if (source)
-			fclose(source);
-		if (target)
-			fclose(target);
-
-		zstrm_destroy(z);
-		exit(0);
+		puts("Error: Failed to open or create file");
+		goto L_ERROR;
 	}
 
 	if (argc == 4) {
@@ -189,8 +179,10 @@ main(int argc, char* argv[])
 		inflate(z, source, target);
 	}
 
-	zstrm_destroy(z);
-	fclose(source);
-	fclose(target);
+L_ERROR:
+	if (source) fclose(source);
+	if (target) fclose(target);
+	if (z)
+		zstrm_destroy(z);
 	return 0;
 }
