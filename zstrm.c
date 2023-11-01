@@ -1,6 +1,6 @@
+#include <jdeflate/zstrm.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <zstrm.h>
 
 
 uint8 iobuffer[4096];

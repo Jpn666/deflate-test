@@ -1,4 +1,4 @@
-#include <deflator.h>
+#include <jdeflate/deflator.h>
 #include <stdio.h>
 
 
