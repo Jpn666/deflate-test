@@ -146,7 +146,7 @@ main(int argc, char* argv[])
 	level = 0;
 	if (argc == 4) {
 		lvend = argv[1];
-		level = strtoll(argv[1], &lvend, 0);
+		level = (intxx) strtoll(argv[1], &lvend, 0);
 		if (lvend == argv[1] || level < 0 || level > 9) {
 			puts("Error: Invalid compression level...");
 			showusage();
