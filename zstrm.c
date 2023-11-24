@@ -161,11 +161,10 @@ parsearguments(char* argv[], struct TArguments result[1])
 		if (argv[0][1] == 'f') {
 			if (hasformat)
 				goto L_ERROR;
-			result[0].format = -1;
 			if (strcmp(argv[1],    "gzip") == 0) result[0].format = ZSTRM_GZIP;
 			if (strcmp(argv[1],    "zlib") == 0) result[0].format = ZSTRM_ZLIB;
 			if (strcmp(argv[1], "deflate") == 0) result[0].format = ZSTRM_DFLT;
-			if (result[0].format == -1) {
+			if (result[0].format == (uintxx) -1) {
 				goto L_ERROR;
 			}
 			argv++;
@@ -208,6 +207,8 @@ main(int argc, char* argv[])
 	}
 
 	if (argc == 6) {
+		a[0].format = (uintxx) -1;
+		a[0].level  = (uintxx) -1;
 		if (parsearguments(argv, a) == 0) {
 			showusage();
 			return 0;
