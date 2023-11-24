@@ -17,7 +17,7 @@ compressfile(FILE* ihandle, FILE* ohandle)
 
 	state = deflator_create(9, NULL);
 	if (state == NULL) {
-		puts("Failed to creare deflator struct");
+		puts("Failed to create deflator struct");
 		return 0;
 	}
 
