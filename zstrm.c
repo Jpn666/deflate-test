@@ -124,15 +124,16 @@ showusage(void)
 
 
 static void*
-reserve(void* user, uintxx amount)
+request_(uintxx amount, void* user)
 {
 	(void) user;
 	return malloc(amount);
 }
 
 static void
-release(void* user, void* memory)
+dispose_(void* memory, uintxx amount, void* user)
 {
+	(void) amount;
 	(void) user;
 	free(memory);
 }
@@ -215,8 +216,8 @@ main(int argc, char* argv[])
 		}
 	}
 
-	allocator[0].reserve = reserve;
-	allocator[0].release = release;
+	allocator[0].request = request_;
+	allocator[0].dispose = dispose_;
 
 	level = 0;
 	if (argc == 6) {
